@@ -28,5 +28,5 @@ encoded = {}
 for command, value in yausbir_commands.items():
     hval = (value/13) | 0x8000
     msb, lsb = divmod(hval, 0x100)
-    encoded[command] = [0x01, 0x4E, "0x%s" % msb, "0x%s" % lsb ]
+    encoded[command] = [0x01, 0x4E,  msb, lsb ]
     print command, ":\t", encoded[command]
