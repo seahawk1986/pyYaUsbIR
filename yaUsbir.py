@@ -39,7 +39,7 @@ while True:
                     t = True
                 else: 
                     t = False
-                duation = data[1] * result
+                duration = data[1] * result
                 if data[n] is 0 and data[n+1] is 0:
                     break
                 print("%s %s us - raw: 0x%02x%02x" % (t, duration, data[n], data[n+1]))
