@@ -33,23 +33,16 @@ while True:
         last = 0
         for n in range(2, len(data), 2):
             if data[0] == 1:
+                result = (int(data[n]) & 0x7F) << 8
+                result = result | data[n + 1]
+                if data[n] & 0x80 == 0x80:
+                    t = True
+                else: 
+                    t = False
+                duation = data[1] * result
                 if data[n] is 0 and data[n+1] is 0:
                     break
-                duration = data[n+1] * data[1]
-                if data[n] == 128:
-                    #pulse
-                    t = True
-                elif data[n] == 127:
-                    # pause > 0.5 seconds
-                    t = False
-                    #decoder.start()
-                elif data[n] == 0:
-                    # pause
-                    t = False
-                else:
-                  continue
-                duration = data[n+1] * data[1]
-                print("%s %3d us" % (t, duration))
+                print("%s %s us - raw: 0x%02x%02x" % (t, duration, data[n], data[n+1]))
                 decoder.addEvent(t, duration)
 
     except usb.core.USBError as e:
