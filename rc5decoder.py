@@ -8,6 +8,7 @@ class RC5Decoder:
     s_max = 1333
     l_min = 1334
     l_max = 5000
+    #p_repeat = 
     def __init__(self):
         self.ircode = ctypes.c_ushort(0)
         self.state = self.midOne
@@ -40,12 +41,16 @@ class RC5Decoder:
                 self.repeat += 1
             else:
                 self.repeat = 0
-            if bytestring[3] == "1":
-                extended = False
-            else:
-                extended = True
+            print bytestring[5:9]
+            address = eval("0b"+ bytestring[5:10])
+            cmdbitseven = str(int(bytestring[3]) ^ 1)
+            cmd_n = bytestring[10:]
+            cmdstr = cmdbitseven + cmd_n
+            cmd = eval("0b" + cmdstr)
             #print "got code: ", bytestring, "repeat: ", (toggleBit == self.toggleBit), "extended RC5:", extended
-            print "extended RC5: ", extended, "\trepeat: ", self.repeat, "\tAddress: ", hex(int(bytestring[5:9],2)), "\tCommand: ", hex(int(bytestring[10:],2))
+            print "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit
+            
+            print "0x%02x%02x" % (address, cmd)
             self.toggleBit = toggleBit
             self.ircode.value = 0
 
@@ -58,6 +63,7 @@ class RC5Decoder:
         return (self.l_min < duration < self.l_max)
 
     def start(self):
+        #print 20 * "#", "START", 20 * "#"
         self.ircode.value = 0
 	self.state = self.midOne
 	self.emitBit(1)

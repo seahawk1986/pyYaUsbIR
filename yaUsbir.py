@@ -4,6 +4,8 @@ import usb.core
 import usb.control
 
 from rc5decoder import RC5Decoder
+from necdecoder import NECDecoder
+from samsungdecoder import SamsungDecoder
 
 ID_VENDOR = 0x10c4
 ID_PRODUCT = 0x876c
@@ -25,7 +27,9 @@ except usb.core.USBError as e:
 endpoint = device[0][(0,0)][0]
 code = []
 
-decoder = RC5Decoder()
+rc5decoder = RC5Decoder()
+necdecoder = NECDecoder()
+samsungdecoder = SamsungDecoder()
 while True:
     try:
         data = device.read(endpoint.bEndpointAddress, endpoint.wMaxPacketSize)
@@ -42,8 +46,10 @@ while True:
                 duration = data[1] * result
                 if data[n] is 0 and data[n+1] is 0:
                     break
-                print("%s %s us - raw: 0x%02x%02x" % (t, duration, data[n], data[n+1]))
-                decoder.addEvent(t, duration)
+                #print("%s %s us - raw: 0x%02x%02x" % (t, duration, data[n], data[n+1]))
+                rc5decoder.addEvent(t, duration)
+                necdecoder.addEvent(t, duration)
+                samsungdecoder.addEvent(t, duration)
 
     except usb.core.USBError as e:
         #print(e.args)
