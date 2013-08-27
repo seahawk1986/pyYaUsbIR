@@ -28,6 +28,7 @@ endpoint = device[0][(0,0)][0]
 code = []
 
 rc5decoder = RC5Decoder()
+rc6decoder = RC6Decoder()
 necdecoder = NECDecoder()
 samsungdecoder = SamsungDecoder()
 while True:
@@ -48,6 +49,7 @@ while True:
                     break
                 #print("%s %s us - raw: 0x%02x%02x" % (t, duration, data[n], data[n+1]))
                 rc5decoder.addEvent(t, duration)
+                rc6decoder.addEvent(t, duration)
                 necdecoder.addEvent(t, duration)
                 samsungdecoder.addEvent(t, duration)
 
