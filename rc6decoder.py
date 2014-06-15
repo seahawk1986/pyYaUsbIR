@@ -18,13 +18,14 @@ class RC6Decoder:
     start_max = 2800
     
     #p_repeat = 
-    def __init__(self):
+    def __init__(self, output):
         self.ircode = ctypes.c_ulong(0)
         self.state = self.midOne
         self.start()
         self.toggleBit = None
         self.last_t = None
         self.repeat = 0
+        self.output = output
 
     def addEvent(self, t, duration):
         if t and self.last_t == t: 
@@ -45,7 +46,7 @@ class RC6Decoder:
         #print str(bin(self.ircode.value))[4:7]
         if str(bin(self.ircode.value))[4:7] == "000":
             print(len(str(bin(self.ircode.value))[2:]))
-            print "RC6 protocol"
+            print("RC6 protocol")
         elif str(bin(self.ircode.value))[4:7] == "110" and self.ircode.value >= 0b1100000000000000000000000000000000000:
             #print len(str(bin(self.ircode.value))[2:])
             bytestring = str(bin(self.ircode.value))[2:]
@@ -64,7 +65,8 @@ class RC6Decoder:
             cmdstr = bytestring[22:]
             cmd = eval("0b" + cmdstr)
             #print "got code: ", bytestring, "repeat: ", (toggleBit == self.toggleBit), "extended RC5:", extended
-            print "RC6A - Header: ", "0b"+header, "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit
+            print("RC6A - Header: ", "0b"+header, "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
+            self.output.output(address, self.repeat, cmd, 'RC-6')
             
             #print "raw: 0x%02x%02x" % (address, cmd)
             self.toggleBit = toggleBit
@@ -84,9 +86,9 @@ class RC6Decoder:
         return self.t_min < duration < self.t_max
 
     def start(self):
-        print 20 * "#", "START", 20 * "#"
-	self.state = self.startBitP
-	#self.emitBit(1)
+        #print(20 * "#", "RC-6 START", 20 * "#")
+        self.state = self.startBitP
+        #self.emitBit(1)
 
     def startBitP(self, t, duration):
         #print "start bit pulse"
@@ -147,7 +149,7 @@ class RC6Decoder:
     def startToggleOne(self, t, duration):
         #print "start Toggle One"
         if t and self.isLong(duration):
-            print "next is Zero"
+            print("next is Zero")
             self.emitBit(1)
             self.state = self.endToggleOne
         elif t and self.isToggle(duration):

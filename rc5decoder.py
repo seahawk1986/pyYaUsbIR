@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
+from __future__ import print_function
 import ctypes
+
 
 class RC5Decoder:
     """ very useful explanation for the state machine: http://www.clearwater.com.au/code/rc5 """
@@ -9,13 +11,14 @@ class RC5Decoder:
     l_min = 1334
     l_max = 5000
     #p_repeat = 
-    def __init__(self):
+    def __init__(self, output):
         self.ircode = ctypes.c_ushort(0)
         self.state = self.midOne
         self.start()
         self.toggleBit = None
         self.last_t = None
         self.repeat = 0
+        self.output = output
 
     def addEvent(self, t, duration):
         if t and self.last_t == t: 
@@ -35,24 +38,24 @@ class RC5Decoder:
             self.ircode.value += bit
         if self.ircode.value > 8192:
             bytestring = str(bin(self.ircode.value))
-            print bytestring
+            print(bytestring)
             toggleBit = bytestring[4]
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
-            print bytestring[5:9]
+            print(bytestring[5:9])
             address = eval("0b"+ bytestring[5:10])
             cmdbitseven = str(int(bytestring[3]) ^ 1)
             cmd_n = bytestring[10:]
             cmdstr = cmdbitseven + cmd_n
             cmd = eval("0b" + cmdstr)
-            #print "got code: ", bytestring, "repeat: ", (toggleBit == self.toggleBit), "extended RC5:", extended
-            print "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit
+            print("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
             
-            print "0x%02x%02x" % (address, cmd)
+            #print("0x%02x%02x" % (address, cmd))
             self.toggleBit = toggleBit
             self.ircode.value = 0
+            self.output.output(address, self.repeat, cmd, 'RC-5')
 
     def isShort(self, duration):
         a = (self.s_min < duration < self.s_max)
@@ -63,10 +66,10 @@ class RC5Decoder:
         return (self.l_min < duration < self.l_max)
 
     def start(self):
-        #print 20 * "#", "START", 20 * "#"
+        #print(20 * "#", "RC-5 START", 20 * "#")
         self.ircode.value = 0
-	self.state = self.midOne
-	self.emitBit(1)
+        self.state = self.midOne
+        self.emitBit(1)
 
     def startOne(self, t, duration):
         if not t and self.isShort(duration):

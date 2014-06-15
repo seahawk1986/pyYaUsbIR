@@ -17,11 +17,9 @@ class RC5Encoder:
         pass
 
     def send_hexcode(self, code):
+        """return code for a ir command containing two bytes for the address and two for the command"""
         bitcmd = [1] # Start Bit, always 1
         addr, cmd = divmod(code, 0x100)
-        print hex(addr), hex(cmd)
-        print bin(addr), bin(cmd)
-        print addr, cmd
         if code & 0x40 == 0x40: # 2nd Start Bit, 0 for RC5X, 1 for RC5
           print "extended"
           bitcmd.append(0)
@@ -84,45 +82,3 @@ class RC5Encoder:
         print result
         return result
 
-
-
-    def send_bytestring(self, bytestring):
-        for n in range(2, len(bytestring)):
-            #print n, bytestring[n]
-            self.ircommand.extend(self.addBit(n, bytestring))
-        #print self.ircommand
-        result = self.prepare()
-        return result
-
-    def addBit(self, n, bytestring):
-        elements = []
-        if n + 1 >= len(bytestring):
-            return [self.s_len]
-        if bytestring[n-1] == "b" and bytestring[n+1] == "1":
-            print "begin Encoding"
-            elements.extend([self.s_len,self.s_len])
-        elif bytestring[n-1] == "b" and bytestring[n+1] == "0":
-            elements.append(self.l_len)
-        elif bytestring[n+1] == bytestring[n]:
-            elements.extend([self.s_len, self.s_len])
-        else:
-            elements.append(self.l_len)
-
-        return elements
-    
-    def prepare(self):
-        a = [0x01,self.frequency]
-        result = []
-        for irtype, byte in zip(self.ircommand, itertools.cycle([128,0])):
-            a.extend([byte, irtype])
-            if len(a) == 64:
-                result.append(a)
-                a = [0x01,self.frequency]
-        if len(a) > 2:
-            result.extend(a)
-        #print result
-        return result
-if __name__ == '__main__':
-    encoder = RC5Encoder()
-    encoder.send_bytestring("0b11111110100101")
-    #print encoder.ircommand
