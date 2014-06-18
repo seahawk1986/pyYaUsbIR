@@ -6,6 +6,7 @@ an userspace driver for yaUsbIR written in python
 requires:
 ---------
  * python3
+ * python-bitarray
  * python-dbus
  * python-gi
  * pyhton-uinput: https://github.com/tuomasjjrasanen/python-uinput
