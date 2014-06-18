@@ -20,4 +20,5 @@ TODO:
  * optional uinput key generation via uinput
  * configuration file to (de)activate decoders
  * control daemon via dbus
+ * Learning mode
  * additional decoders and encoders (?)
