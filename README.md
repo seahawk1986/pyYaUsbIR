@@ -1,18 +1,19 @@
 pyYaUsbIR
 =========
 
-python userspace driver for yaUsbIR
+an userspace driver for yaUsbIR written in python
 
 requires:
 ---------
  * python3
- * pyusb: https://github.com/walac/pyusb
- * python-gi
- * pyhton-uinput
  * python-dbus
+ * python-gi
+ * pyhton-uinput: https://github.com/tuomasjjrasanen/python-uinput
+ * pyusb: https://github.com/walac/pyusb
 
 TODO:
  * remove massive debug output
+ * allow to set socket as start argument
  * cleanup code and optimize for python3
  * allow lirc output for samsung codes
  * learning mode
