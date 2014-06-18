@@ -1,4 +1,5 @@
 [RC-5_30]
+# Hauppauge Hauppauge-A415-HPG-WE
 0x00	KEY_0
 0x01	KEY_1
 0x02	KEY_2
@@ -46,6 +47,7 @@
 0x3d	KEY_POWER2
 
 [RC-6_15]
+# MCE Profile Harmony
 0x400	KEY_0
 0x401	KEY_1
 0x402	KEY_2
@@ -59,6 +61,7 @@
 0x422	KEY_OK
 
 [NEC_0]
+# new black Sundtek Remote
 0xa2	KEY_1
 0x86	KEY_2
 0x8a	KEY_3
