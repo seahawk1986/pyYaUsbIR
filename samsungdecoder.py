@@ -1,26 +1,24 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
+import struct
+import bitarray
 
-class SamsungDecoder:
-    """ very useful explanation for the state machine: http://www.clearwater.com.au/code/rc5 """
+class Samsung32Decoder:
     start_p_min = 4000
     start_p_max = 5000
     start_s_min = 4000
     start_s_max = 5000
-    #start_r_min = 1800
-    #start_r_max = 2500
     s_min = 400
     s_max = 700
     l_min = 1500
     l_max = 1800
-    #p_repeat = 
+    
     def __init__(self, output):
-        self.ircode = []
+        self.ircode = bitarray.bitarray()
         self.state = self.startBitP
         self.start()
         self.repeat = 0
-        self.extended = False
-        self.lastcommand = None
+        self.lastcode = None
         self.output = output
 
     def addEvent(self, t, duration):
@@ -30,27 +28,18 @@ class SamsungDecoder:
         if bit in (0,1):
             self.ircode.append(bit)
         if len(self.ircode) == 32:
-            addr_lsb = self.ircode[0:3]
-            addr_msb = self.ircode[3:7]
-            addr_c_lsb = self.ircode[8:11]
-            addr_c_msb = self.ircode[12:15]
-            self.addr = eval("0b" + 
-                             "".join(map(str,addr_msb)) + 
-                             "".join(map(str,addr_lsb)) +
-                             "".join(map(str,addr_c_msb)) +
-                             "".join(map(str,addr_c_lsb))
-                             )
-            cmd_lsb = self.ircode[16:19]
-            cmd_msb = self.ircode[20:23]
-            cmd_c_lsb = self.ircode[24:27]
-            cmd_c_msb = self.ircode[28:31]
-            self.cmd = eval("0b" +
-                            "".join(map(str,cmd_msb)) + 
-                            "".join(map(str,cmd_lsb)) +
-                            "".join(map(str,cmd_c_msb)) +
-                            "".join(map(str,cmd_c_lsb)) )
-            self.lastcode = self.ircode
-            self.send_code()
+            self.addr, check_addr, self.cmd, check_cmd = struct.unpack('BBBB', self.ircode.tobytes())
+            if self.addr == check_addr:
+                # two identical bytes
+                if self.cmd & 0xf == ~check_cmd & 0xf:
+                    # complimentary data bytes
+                    self.cmd = int('{:08b}'.format(self.cmd)[::-1], 2)
+                    self.addr = int('{:08b}'.format(self.addr)[::-1], 2)
+                    self.lastcode = self.ircode
+                    self.send_code()
+            else:
+                print("{0:08b} {1:08b}".format( self.addr, self.cmd))
+                print("{0:08b} {1:08b}".format(self.cmd,  ~inv_cmd & 0xF))
 
     def isStartP(self, duration):
         return self.start_p_min < duration < self.start_p_max
@@ -68,7 +57,7 @@ class SamsungDecoder:
         return (self.l_min < duration < self.l_max)
 
     def start(self):
-        #print(20 * "#", "SAMSUNG START", 20 * "#")
+        #logging.debug(20 * "#", "SAMSUNG START", 20 * "#")
         self.state = self.startBitP
 
     def startBitP(self, t, duration):
@@ -77,25 +66,25 @@ class SamsungDecoder:
             self.state = self.startBitE
 
     def startBitE(self, t, duration):
-        #print "startBitE: ", t, duration
+        #logging.debug("startBitE: ", t, duration)
         if not t and self.isStartS(duration):
-            #print "begin Body"
-            self.ircode = []
+            #logging.debug("begin Body")
+            self.ircode = bitarray.bitarray()
             self.repeat = 0
             self.state = self.startMB
         else:
-            #print "back to start!"
+            #logging.debug("back to start!")
             self.start()
 
     def startMB(self, t, duration):
         if t and self.isShort(duration):
-            #print "start MBit"
+            #logging.debug("start MBit")
             self.state = self.endMB
         else:
             self.start()
     
     def endMB(self, t, duration):
-        #print "end MBit"
+        #logging.debug("end MBit")
         if not t and self.isShort(duration):
             self.emitBit(0)
             self.state = self.startMB
@@ -110,5 +99,5 @@ class SamsungDecoder:
         self.send_code()
 
     def send_code(self):
-        #print self.lastcode
-        print("got code from addr: %s cmd: %s repeat: %s" % (str(bin(self.addr)), str(bin(self.cmd)), self.repeat))
+        #logging.debug("got code from addr: 0x{0:02x} cmd: 0x{1:02x} repeat: {2:1d}".format(self.addr, self.cmd, self.repeat))
+        self.output.output(self.addr, self.repeat, self.cmd, 'samsung')

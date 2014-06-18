@@ -11,7 +11,7 @@ dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 from rc5decoder import RC5Decoder
 from rc6decoder import RC6Decoder
 from necdecoder import NECDecoder
-from samsungdecoder import SamsungDecoder
+from samsungdecoder import Samsung32Decoder
 from output import Output, OutputDev
 
 #while True:
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     rc5decoder = RC5Decoder(output)
     rc6decoder = RC6Decoder(output)
     necdecoder = NECDecoder(output)
-    samsungdecoder = SamsungDecoder(output)
+    samsungdecoder = Samsung32Decoder(output)
 
     loop = GObject.MainLoop()
     a = GObject.idle_add(read_data)
