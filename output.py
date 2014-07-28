@@ -92,7 +92,7 @@ class OutputDev():
                     #print("send code")
                     #line = " ".join([str(code), str(count), str(cmd), device])
                     keyname = self.keymap.get_keyname(cmd, code, device)
-                    line = "{0:02x} {1:02d} {2} {4}_{3}\n".format(cmd, count, keyname, code, device)
+                    line = "{0:02x} {1:02x} {2} {4}_{3}\n".format(cmd, count, keyname, code, device)
                     #line = "%s\n" % line
                     line = line.encode('utf-8')
                     conn.send(line)

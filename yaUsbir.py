@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import division
 from __future__ import print_function
 import dbus
@@ -14,7 +15,6 @@ from necdecoder import NECDecoder
 from samsungdecoder import Samsung32Decoder
 from output import Output, OutputDev
 
-#while True:
 def read_data():
     try:
         data = device.read(endpoint.bEndpointAddress, endpoint.wMaxPacketSize)
