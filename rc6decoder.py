@@ -4,7 +4,8 @@
 # Supports RC6A-32 (mce version)
 # TODO: RC6, RC6A-24 bit (apparently no toggle bit), RC6A-20 bit
 # 
-import ctypes
+import bitarray
+import struct
 
 class RC6Decoder:
     """ very useful explanation for the state machine: http://www.clearwater.com.au/code/rc5 """
@@ -19,7 +20,7 @@ class RC6Decoder:
     
     #p_repeat = 
     def __init__(self, output):
-        self.ircode = ctypes.c_ulong(0)
+        self.ircode = bitarray.bitarray()
         self.state = self.midOne
         self.start()
         self.toggleBit = None
@@ -39,19 +40,25 @@ class RC6Decoder:
         self.last_t = t
 
     def emitBit(self, bit):
-        if bit in (0,1):
-            if self.ircode.value > 0:
-                self.ircode.value = self.ircode.value << 1
-            self.ircode.value += bit
+        #print("got bit:", bit)
+        self.ircode.append(bit)
+        #print(self.ircode.to01())
+        #print(len(self.ircode))
+        #print(self.ircode[:5].tolist())
         #print str(bin(self.ircode.value))[4:7]
-        if str(bin(self.ircode.value))[4:7] == "000":
-            print(len(str(bin(self.ircode.value))[2:]))
-            print("RC6 protocol")
-        elif str(bin(self.ircode.value))[4:7] == "110" and self.ircode.value >= 0b1100000000000000000000000000000000000:
+        #if str(bin(self.ircode.value))[4:7] == "000":
+        #print(self.ircode[4:7])
+        #if self.ircode[4:7].tolist() == [0,0,0]:
+        #    print(len(self.ircode))
+        #    print("RC6 protocol")
+        #elif str(bin(self.ircode.value))[4:7] == "110" and self.ircode.value >= 0b1100000000000000000000000000000000000:
+        if self.ircode[:5].tolist() == [1,1,1,1,0] and len(self.ircode) == 37:
+            #print("got complete rc-6 code")
             #print len(str(bin(self.ircode.value))[2:])
-            bytestring = str(bin(self.ircode.value))[2:]
+            #print(len(self.ircode))
+            bytestring = self.ircode.to01()
             #print bytestring
-            #print bytestring[:17], bytestring[17:21], bytestring[21], bytestring[22:]
+            #print(bytestring[:17], bytestring[17:21], bytestring[21], bytestring[22:])
             header = bytestring[:17]
             addr = bytestring[17:21]
             toggleBit = bytestring[21]
@@ -93,7 +100,7 @@ class RC6Decoder:
     def startBitP(self, t, duration):
         #print "start bit pulse"
         if self.isStartP(duration):
-            self.ircode.value = 0
+            self.ircode = bitarray.bitarray()
             self.emitBit(1)
             self.state = self.startBitS
 
@@ -134,7 +141,7 @@ class RC6Decoder:
         #print "mid Zero: ", t, duration
         if t and self.isShort(duration):
             self.state = self.startZero
-            if 0b110000 > self.ircode.value > 0b11000:
+            if 0b110000 > eval("0b%s" % self.ircode.to01()) > 0b11000:
                 self.state = self.startToggleZero
                 
         elif t and self.isLong(duration):
@@ -175,3 +182,4 @@ class RC6Decoder:
             self.state = self.startOne
         else:
             self.start()
+
