@@ -52,7 +52,7 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option("-s", "--socket", dest = "socket", default="/var/run/lirc/lircd.ya")
     parser.add_option("-k", "--keymap", dest="keymap", default="keymap.txt", metavar = "KEYMAP")
-    parser.add_option("-p", "--protocoll", dest="protocol", default="RC-5 RC-6 NEC SAMSUNG", metavar = "\"RC-5 RC-6 NEC SAMSUNG\"")
+    parser.add_option("-p", "--protocol", dest="protocol", default="RC-5 RC-6 NEC SAMSUNG", metavar = "\"RC-5 RC-6 NEC SAMSUNG\"")
 
     (options, args) = parser.parse_args()
     protocols = options.protocol.split()
