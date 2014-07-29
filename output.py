@@ -10,10 +10,10 @@ from gi.repository import GObject
 
 class Output():
 
-    def __init__(self,socket_path,activeout="lirc"):
+    def __init__(self,socket_path,activeout="lirc",keymap="keymap.txt"):
         self.OutputDevs = {}
-        self.keymap = Keymap()
-        self.add_output_device()
+        self.keymap = Keymap(keymap)
+        #self.add_output_device()
         self.add_output_device(devicename='lirc',devicetype='lirc',socket_path=socket_path, keymap=self.keymap)
         self.active_output = None
         self.set_active_output(activeout)
@@ -105,11 +105,12 @@ class OutputDev():
                     self.conns.pop(self.conns.index(conn))
 
 class Keymap:
-    def __init__(self):
+    def __init__(self, keymap):
+       print("reading keymap %s" % keymap)
        self.parser = configparser.SafeConfigParser(delimiters=(" ","\t"))
        self.parser.optionxform = str
        self.remotes = {}
-       with open("keymap.txt", 'r', encoding='utf-8') as f:
+       with open(keymap, 'r', encoding='utf-8') as f:
             self.parser.readfp(f)
        for remote in self.parser.keys():
             key_dict = {}

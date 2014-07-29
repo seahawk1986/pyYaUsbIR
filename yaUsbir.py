@@ -76,7 +76,7 @@ if __name__ == '__main__':
     endpoint = device[0][(0,0)][0]
     code = []
     
-    output = Output(options.socket, 'lirc')
+    output = Output(options.socket, 'lirc', options.keymap)
     #output.add_output_device(devicename='lirc', devicetype='lirc', match=['KEY_'], socket_path='/var/run/lird')
     if  "RC-5" in protocols:
         from rc5decoder import RC5Decoder
