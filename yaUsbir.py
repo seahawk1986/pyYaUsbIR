@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 #from __future__ import division
 #from __future__ import print_function
-import dbus
+#import dbus
 import logging
 from optparse import OptionParser
 import sys
 import usb.core
 import usb.control
 from gi.repository import GObject
-from dbus.mainloop.glib import DBusGMainLoop
-dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+#from dbus.mainloop.glib import DBusGMainLoop
+#dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 from output import Output, OutputDev
 
@@ -52,9 +52,11 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option("-s", "--socket", dest = "socket", default="/var/run/lirc/lircd.ya")
     parser.add_option("-k", "--keymap", dest="keymap", default="keymap.txt", metavar = "KEYMAP")
-    parser.add_option("-p", "--protocoll", dest="protocol", default="RC-5 RC-6 NEC SAMSUNG", metavar = "RC-5 RC-6 NEC SAMSUNG")
+    parser.add_option("-p", "--protocoll", dest="protocol", default="RC-5 RC-6 NEC SAMSUNG", metavar = "\"RC-5 RC-6 NEC SAMSUNG\"")
+
     (options, args) = parser.parse_args()
     protocols = options.protocol.split()
+    print("enabled protocols:", protocols)
 
     ID_VENDOR = 0x10c4
     ID_PRODUCT = 0x876c
