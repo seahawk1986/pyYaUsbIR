@@ -2,8 +2,9 @@ import configparser
 import itertools
 import os
 import socket
+import stat
 import syslog
-import uinput
+#import uinput
 from gi.repository import GObject
 
 
@@ -19,7 +20,7 @@ class Output():
         syslog.syslog("Lircd Socket is set to %s" %(socket_path))
 
     def output(self, code, count, cmd, device):
-        print(" ".join([str(code), str(count), str(cmd), device]))
+        #logging.debug(" ".join([str(code), str(count), str(cmd), device]))
         if self.active_output != None:
             #print("send key")
             self.active_output.send_key(code, count, cmd, device)
@@ -31,35 +32,35 @@ class Output():
         else:
             try:
                 self.active_output = self.OutputDevs[device]
-                print(self.active_output)
+                #print(self.active_output)
             except:
                 syslog.syslog('No matching device for %s found, setting to None' %(device))
                 self.active_output = None
 
-    def add_output_device(self, devicename='uinput', devicetype='uinput', match=['KEY_'], socket_path='/var/run/lirc/bridge', keymap=None):
+    def add_output_device(self, devicename='lirc', devicetype='lirc', match=['KEY_'], socket_path='/var/run/lirc/lircd.ya', keymap=None):
         self.OutputDevs[devicename] = OutputDev(devicename,devicetype,match,socket_path, keymap=self.keymap)
-        print('test2')
+        #print('test2')
 
 class OutputDev():
   
-    def __init__(self, devicename='uinput', devicetype='uinput', match=['KEY_','BTN_','REL_'],
-                                                       socket_path='/var/run/lirc/lircd', keymap=None):    
+    def __init__(self, devicename='lirc', devicetype='lirc', match=['KEY_','BTN_','REL_'],
+                                                       socket_path='/var/run/lirc/lircd.ya', keymap=None):    
         self.devicetype = devicetype    
         self.keymap = keymap
-        if devicetype == 'uinput':
-            self.events = self.select_capabilities(match)
-            self.device = uinput.Device(self.events, devicename)
+        #if devicetype == 'uinput':
+        #    self.events = self.select_capabilities(match)
+        #    self.device = uinput.Device(self.events, devicename)
         if devicetype == 'lirc':
             self.device = self.create_lircd_socket(socket_path)
             self.conns = []
 
-    def select_capabilities(self,match):
+    """def select_capabilities(self,match):
         keys = []
         items = dir(uinput)
         for item in itertools.product(match,items):
             if item[1].startswith(item[0]):
                 keys.append(eval('uinput.%s'%(item[1])))
-        return keys
+        return keys"""
 
     def create_lircd_socket(self, socket_path):
         try:
@@ -70,6 +71,7 @@ class OutputDev():
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(socket_path)
         sock.listen(5)
+        os.chmod(socket_path, 0o777)
         GObject.io_add_watch(sock, GObject.IO_IN, self.listener)
         print("created Lirc-Socket %s"%(socket_path))
         return sock
@@ -117,7 +119,7 @@ class Keymap:
              
 
     def get_keyname(self, cmd, address, decoder):
-        print("{0}_{1}".format(decoder, address),"{0:#02x}".format(cmd))
+        #logging.debug("{0}_{1}".format(decoder, address),"{0:#02x}".format(cmd))
         try:
             return self.remotes["{0}_{1}".format(decoder, address)][cmd]
         except Exception as e:

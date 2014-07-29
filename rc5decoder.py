@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
-from __future__ import print_function
 import ctypes
 
 
@@ -38,19 +37,19 @@ class RC5Decoder:
             self.ircode.value += bit
         if self.ircode.value > 8192:
             bytestring = str(bin(self.ircode.value))
-            print(bytestring)
+            #print(bytestring)
             toggleBit = bytestring[4]
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
-            print(bytestring[5:9])
+            #logging.debug(bytestring[5:9])
             address = eval("0b"+ bytestring[5:10])
             cmdbitseven = str(int(bytestring[3]) ^ 1)
             cmd_n = bytestring[10:]
             cmdstr = cmdbitseven + cmd_n
             cmd = eval("0b" + cmdstr)
-            print("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
+            #logging.debug("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
             
             #print("0x%02x%02x" % (address, cmd))
             self.toggleBit = toggleBit

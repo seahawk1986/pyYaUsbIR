@@ -6,6 +6,7 @@
 # 
 import bitarray
 import struct
+import logging
 
 class RC6Decoder:
     """ very useful explanation for the state machine: http://www.clearwater.com.au/code/rc5 """
@@ -72,7 +73,7 @@ class RC6Decoder:
             cmdstr = bytestring[22:]
             cmd = eval("0b" + cmdstr)
             #print "got code: ", bytestring, "repeat: ", (toggleBit == self.toggleBit), "extended RC5:", extended
-            print("RC6A - Header: ", "0b"+header, "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
+            #logging.debug("RC6A - Header: ", "0b"+header, "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
             self.output.output(address, self.repeat, cmd, 'RC-6')
             
             #print "raw: 0x%02x%02x" % (address, cmd)
@@ -141,7 +142,8 @@ class RC6Decoder:
         #print "mid Zero: ", t, duration
         if t and self.isShort(duration):
             self.state = self.startZero
-            if 0b110000 > eval("0b%s" % self.ircode.to01()) > 0b11000:
+            #if 0b110000 > eval("0b%s" % self.ircode.to01()) > 0b11000:
+            if 7 > len(self.ircode) > 4 and self.ircode[:2].tolist() == [1,1]:
                 self.state = self.startToggleZero
                 
         elif t and self.isLong(duration):
@@ -156,7 +158,7 @@ class RC6Decoder:
     def startToggleOne(self, t, duration):
         #print "start Toggle One"
         if t and self.isLong(duration):
-            print("next is Zero")
+            #print("next is Zero")
             self.emitBit(1)
             self.state = self.endToggleOne
         elif t and self.isToggle(duration):

@@ -56,7 +56,7 @@ class NECDecoder:
                 if lsb is not lsb_c and msb is not msb_c:
                     cmd = True
                 else:
-                    print("control bits do not match!")
+                    #print("control bits do not match!")
                     cmd = False
                     break
             if cmd:
@@ -130,5 +130,5 @@ class NECDecoder:
 
     def send_code(self):
         #print self.lastcode
-        print("got code from addr: %s cmd: %s repeat: %s" % (str(hex(self.addr)), str(hex(self.cmd)), self.repeat))
+        #logging.debug("got code from addr: %s cmd: %s repeat: %s" % (str(hex(self.addr)), str(hex(self.cmd)), self.repeat))
         self.output.output(self.addr, self.repeat, self.cmd, 'NEC')

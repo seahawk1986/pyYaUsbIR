@@ -38,8 +38,9 @@ class Samsung32Decoder:
                     self.lastcode = self.ircode
                     self.send_code()
             else:
-                print("{0:08b} {1:08b}".format( self.addr, self.cmd))
-                print("{0:08b} {1:08b}".format(self.cmd,  ~inv_cmd & 0xF))
+                #print("{0:08b} {1:08b}".format( self.addr, self.cmd))
+                #print("{0:08b} {1:08b}".format(self.cmd,  ~inv_cmd & 0xF))
+                pass
 
     def isStartP(self, duration):
         return self.start_p_min < duration < self.start_p_max
