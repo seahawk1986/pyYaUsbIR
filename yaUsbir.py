@@ -34,14 +34,8 @@ def read_data():
                 if t: typ = "pulse"
                 else: typ = "space"
                 #print(typ, duration)
-                if "RC-6" in protocols:
-                    rc6decoder.addEvent(t, duration)
-                if "NEC" in protocols:
-                    necdecoder.addEvent(t, duration)
-                if "SAMSUNG" in protocols:
-                    samsungdecoder.addEvent(t, duration)
-                if "RC-5" in protocols:
-                    rc5decoder.addEvent(t, duration)
+                for decoder in decoders:
+                    decoder.addEvent(t, duration)
 
     except usb.core.USBError as e:
         #print(e.args)
@@ -77,21 +71,26 @@ if __name__ == '__main__':
     
     endpoint = device[0][(0,0)][0]
     code = []
+    decoders = []
     
     output = Output(options.socket, 'lirc', options.keymap)
     #output.add_output_device(devicename='lirc', devicetype='lirc', match=['KEY_'], socket_path='/var/run/lird')
     if  "RC-5" in protocols:
         from rc5decoder import RC5Decoder
         rc5decoder = RC5Decoder(output)
+        decoders.append(rc5decoder)
     if "RC-6" in protocols:
         from rc6decoder import RC6Decoder
         rc6decoder = RC6Decoder(output)
+        decoders.append(rc6decoder)
     if "NEC" in protocols:
         from necdecoder import NECDecoder
         necdecoder = NECDecoder(output)
+        decoders.append(necdecoder)
     if "SAMSUNG" in protocols:
         from samsungdecoder import Samsung32Decoder
         samsungdecoder = Samsung32Decoder(output)
+        decoders.append(samsungdecoder)
 
     loop = GObject.MainLoop()
     a = GObject.idle_add(read_data)
