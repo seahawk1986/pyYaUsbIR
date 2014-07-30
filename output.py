@@ -115,7 +115,8 @@ class Keymap:
        for remote in self.parser.keys():
             key_dict = {}
             for code, keyname in  self.parser[remote].items():
-                key_dict[eval(code)] = keyname
+                #key_dict[eval(code)] = keyname
+                key_dict[int(code, 16)] = keyname
             self.remotes[remote] = key_dict
              
 
