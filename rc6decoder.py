@@ -5,7 +5,6 @@
 # TODO: RC6, RC6A-24 bit (apparently no toggle bit), RC6A-20 bit
 # 
 import bitarray
-import struct
 import logging
 
 class RC6Decoder:
@@ -58,7 +57,6 @@ class RC6Decoder:
             
             #print "raw: 0x%02x%02x" % (address, cmd)
             self.toggleBit = toggleBit
-            #self.ircode.value = 0
             self.start()
 
     def isShort(self, duration):

@@ -125,6 +125,7 @@ class Keymap:
         try:
             return self.remotes["{0}_{1}".format(decoder, address)][cmd]
         except Exception as e:
-            print(e)
+            pass
+            #print(e)
             
             
