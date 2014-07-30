@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
-import ctypes
 import bitarray
 
 
@@ -35,23 +34,17 @@ class RC5Decoder:
         if bit in (0,1):
             self.ircode.append(bit)
         if len(self.ircode) > 13:
-            bytestring = self.ircode.to01()
-            #print(bytestring)
-            toggleBit = bytestring[2]
+            toggleBit = self.ircode[2]
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
-            #logging.debug(bytestring[5:9])
-            #print("address:", bytestring[3:8])
-            address = int(bytestring[3:8],2)
-            cmdbitseven = str(int(bytestring[1], 2) ^ 1)
-            cmd_n = bytestring[8:]
-            cmdstr = "".join([cmdbitseven, cmd_n])
-            #print(cmdstr)
-            cmd = int(cmdstr, 2)
+            address = int(self.ircode[3:8].to01(),2)
+            cmdbitseven = self.ircode[1:2]
+            cmdbitseven.invert()
+            cmdbitseven.extend(self.ircode[8:])
+            cmd = int(cmdbitseven.to01(), 2)
             #logging.debug("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
-            
             #print("0x%02x%02x" % (address, cmd))
             self.toggleBit = toggleBit
             self.ircode = bitarray.bitarray()
