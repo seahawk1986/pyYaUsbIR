@@ -36,19 +36,19 @@ class RC5Decoder:
             self.ircode.append(bit)
         if len(self.ircode) > 13:
             bytestring = self.ircode.to01()
-            print(bytestring)
+            #print(bytestring)
             toggleBit = bytestring[2]
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
             #logging.debug(bytestring[5:9])
-            print("address:", bytestring[3:8])
+            #print("address:", bytestring[3:8])
             address = int(bytestring[3:8],2)
             cmdbitseven = str(int(bytestring[1], 2) ^ 1)
             cmd_n = bytestring[8:]
             cmdstr = "".join([cmdbitseven, cmd_n])
-            print(cmdstr)
+            #print(cmdstr)
             cmd = int(cmdstr, 2)
             #logging.debug("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
             
