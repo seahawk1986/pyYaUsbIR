@@ -19,7 +19,6 @@ class RC6Decoder:
     start_min = 2200
     start_max = 2800
     
-    #p_repeat = 
     def __init__(self, output):
         self.ircode = bitarray.bitarray()
         self.state = self.midOne
@@ -28,6 +27,7 @@ class RC6Decoder:
         self.last_t = None
         self.repeat = 0
         self.output = output
+        self.rc6_header = bitarray.bitarray([1,1,1,1,0])
 
     def addEvent(self, t, duration):
         if t and self.last_t == t: 
@@ -41,37 +41,17 @@ class RC6Decoder:
         self.last_t = t
 
     def emitBit(self, bit):
-        #print("got bit:", bit)
         self.ircode.append(bit)
-        #print(self.ircode.to01())
-        #print(len(self.ircode))
-        #print(self.ircode[:5].tolist())
-        #print str(bin(self.ircode.value))[4:7]
-        #if str(bin(self.ircode.value))[4:7] == "000":
-        #print(self.ircode[4:7])
-        #if self.ircode[4:7].tolist() == [0,0,0]:
-        #    print(len(self.ircode))
-        #    print("RC6 protocol")
-        #elif str(bin(self.ircode.value))[4:7] == "110" and self.ircode.value >= 0b1100000000000000000000000000000000000:
-        if self.ircode[:5].tolist() == [1,1,1,1,0] and len(self.ircode) == 37:
+        if self.ircode[:5] == self.rc6_header and len(self.ircode) == 37:
             #print("got complete rc-6 code")
-            #print len(str(bin(self.ircode.value))[2:])
-            #print(len(self.ircode))
-            bytestring = self.ircode.to01()
-            #print bytestring
-            #print(bytestring[:17], bytestring[17:21], bytestring[21], bytestring[22:])
-            header = bytestring[:17]
-            addr = bytestring[17:21]
-            toggleBit = bytestring[21]
-            #print "Toggle-Bit: ", toggleBit
+            toggleBit = self.ircode[21]
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
-            #print "HEADER: ", bytestring[2:4]
-            address = eval("0b"+ addr)
-            cmdstr = bytestring[22:]
-            cmd = eval("0b" + cmdstr)
+            #header = self.ircode[:17].to01()
+            address = int(self.ircode[17:21].to01(), 2)
+            cmd = int(self.ircode[22:].to01(), 2)
             #print "got code: ", bytestring, "repeat: ", (toggleBit == self.toggleBit), "extended RC5:", extended
             #logging.debug("RC6A - Header: ", "0b"+header, "Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
             self.output.output(address, self.repeat, cmd, 'RC-6')
@@ -94,9 +74,7 @@ class RC6Decoder:
         return self.t_min < duration < self.t_max
 
     def start(self):
-        #print(20 * "#", "RC-6 START", 20 * "#")
         self.state = self.startBitP
-        #self.emitBit(1)
 
     def startBitP(self, t, duration):
         #print "start bit pulse"
@@ -142,8 +120,7 @@ class RC6Decoder:
         #print "mid Zero: ", t, duration
         if t and self.isShort(duration):
             self.state = self.startZero
-            #if 0b110000 > eval("0b%s" % self.ircode.to01()) > 0b11000:
-            if 7 > len(self.ircode) > 4 and self.ircode[:2].tolist() == [1,1]:
+            if 7 > len(self.ircode) > 4 and self.ircode[:2].all():
                 self.state = self.startToggleZero
                 
         elif t and self.isLong(duration):
