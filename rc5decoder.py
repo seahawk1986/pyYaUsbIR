@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 import ctypes
+import bitarray
 
 
 class RC5Decoder:
@@ -11,7 +12,7 @@ class RC5Decoder:
     l_max = 5000
     #p_repeat = 
     def __init__(self, output):
-        self.ircode = ctypes.c_ushort(0)
+        self.ircode = bitarray.bitarray()
         self.state = self.midOne
         self.start()
         self.toggleBit = None
@@ -32,28 +33,28 @@ class RC5Decoder:
 
     def emitBit(self, bit):
         if bit in (0,1):
-            if self.ircode.value > 0:
-                self.ircode.value = self.ircode.value << 1
-            self.ircode.value += bit
-        if self.ircode.value > 8192:
-            bytestring = str(bin(self.ircode.value))
-            #print(bytestring)
-            toggleBit = bytestring[4]
+            self.ircode.append(bit)
+        if len(self.ircode) > 13:
+            bytestring = self.ircode.to01()
+            print(bytestring)
+            toggleBit = bytestring[2]
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
             #logging.debug(bytestring[5:9])
-            address = eval("0b"+ bytestring[5:10])
-            cmdbitseven = str(int(bytestring[3]) ^ 1)
-            cmd_n = bytestring[10:]
-            cmdstr = cmdbitseven + cmd_n
-            cmd = eval("0b" + cmdstr)
+            print("address:", bytestring[3:8])
+            address = int(bytestring[3:8],2)
+            cmdbitseven = str(int(bytestring[1], 2) ^ 1)
+            cmd_n = bytestring[8:]
+            cmdstr = "".join([cmdbitseven, cmd_n])
+            print(cmdstr)
+            cmd = int(cmdstr, 2)
             #logging.debug("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
             
             #print("0x%02x%02x" % (address, cmd))
             self.toggleBit = toggleBit
-            self.ircode.value = 0
+            self.ircode = bitarray.bitarray()
             self.output.output(address, self.repeat, cmd, 'RC-5')
 
     def isShort(self, duration):
@@ -66,7 +67,7 @@ class RC5Decoder:
 
     def start(self):
         #print(20 * "#", "RC-5 START", 20 * "#")
-        self.ircode.value = 0
+        self.ircode = bitarray.bitarray()
         self.state = self.midOne
         self.emitBit(1)
 
