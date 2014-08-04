@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 #from __future__ import division
 #from __future__ import print_function
-#import dbus
+import dbus
 import logging
 from optparse import OptionParser
 import sys
 import usb.core
 import usb.control
 from gi.repository import GObject
-#from dbus.mainloop.glib import DBusGMainLoop
-#dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
+from dbus.mainloop.glib import DBusGMainLoop
+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+from ir_commands import yaUsbIR_Control
 from output import Output, OutputDev
 
 
@@ -74,7 +74,9 @@ if __name__ == '__main__':
     decoders = []
     
     output = Output(options.socket, 'lirc', options.keymap)
+    yausbir = yaUsbIR_Control(device)
     #output.add_output_device(devicename='lirc', devicetype='lirc', match=['KEY_'], socket_path='/var/run/lird')
+
     if  "RC-5" in protocols:
         from rc5decoder import RC5Decoder
         rc5decoder = RC5Decoder(output)
@@ -94,5 +96,6 @@ if __name__ == '__main__':
 
     loop = GObject.MainLoop()
     a = GObject.idle_add(read_data)
+    #b = GObject.timeout_add(5000, switch_led)
     loop.run()
     

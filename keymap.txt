@@ -1,3 +1,9 @@
+[RC-5_28]
+# yaUsbIR internal keypresses
+0x11    IN_1_H
+0x13	IN_2_H
+
+
 [RC-5_30]
 # Hauppauge Hauppauge-A415-HPG-WE
 0x00	KEY_0
