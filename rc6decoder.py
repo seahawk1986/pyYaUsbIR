@@ -62,15 +62,16 @@ class RC6Decoder:
             self.toggleBit = toggleBit
             self.start()
         elif self.pos_toggleBit == 5 and len(self.ircode) == 22 and self.ircode[:5] == self.rc6_philips_header:
-            #print("got Phillips Code", self.ircode)
-            toggleBit = self.ircode[6]
+            print("got Phillips Code", self.ircode)
+            toggleBit = self.ircode[5]
+            print("ToggleBit:", toggleBit)
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
                 self.repeat = 0
             #header = self.ircode[:6]
-            address = int(self.ircode[7:14].to01(), 2)
-            cmd = int(self.ircode[14:].to01(), 2)
+            address = int(self.ircode[6:13].to01(), 2)
+            cmd = int(self.ircode[13:].to01(), 2)
             self.output.output(address, self.repeat, cmd, 'RC-6')
             self.toggleBit = toggleBit
             self.start()
