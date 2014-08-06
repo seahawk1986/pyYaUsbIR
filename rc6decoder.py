@@ -143,6 +143,12 @@ class RC6Decoder:
         else:
             self.start()
 
+    def endToggleOne():
+        if not t and self.isToggle(duration):
+            self.state = self.midZero
+        elif not t and self.isLong(duration):
+            self.state = self.startOne
+
     def startToggleZero(self, t, duration):
         #print "start Toggle Zero"
         if not t and self.isLong(duration):
