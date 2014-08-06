@@ -2,7 +2,7 @@
 # -*- encoding:utf-8 -*-
 #
 # Supports RC6A-32 (mce version)
-# TODO: RC6, RC6A-24 bit (apparently no toggle bit), RC6A-20 bit
+# TODO: RC6A-24 bit (apparently no toggle bit), RC6A-20 bit
 # 
 import bitarray
 import logging
@@ -62,9 +62,8 @@ class RC6Decoder:
             self.toggleBit = toggleBit
             self.start()
         elif self.pos_toggleBit == 5 and len(self.ircode) == 22 and self.ircode[:5] == self.rc6_philips_header:
-            print("got Phillips Code", self.ircode)
+            #print("got Phillips Code", self.ircode)
             toggleBit = self.ircode[5]
-            print("ToggleBit:", toggleBit)
             if toggleBit == self.toggleBit:
                 self.repeat += 1
             else:
