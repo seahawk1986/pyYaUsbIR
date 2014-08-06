@@ -126,7 +126,7 @@ class RC6Decoder:
             self.state = self.midOne
         elif t and self.isToggle(duration): # short pulse + long pulse
             self.emitBit(0)
-            self.state = self.midToggle
+            self.state = self.midToggleZero
         else:
             self.start()
 
