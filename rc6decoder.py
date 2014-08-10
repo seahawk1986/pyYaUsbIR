@@ -9,7 +9,7 @@ import logging
 
 class RC6Decoder:
     """ very useful explanation for the state machine: http://www.clearwater.com.au/code/rc5 """
-    s_min = 350
+    s_min = 300
     s_max = 600
     l_min = 700
     l_max = 1100
