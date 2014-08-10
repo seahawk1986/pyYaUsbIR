@@ -111,7 +111,7 @@ class RC6Decoder:
             self.state = self.midOne
             self.emitBit(1)
         elif t and self.isLong(duration):
-            self.state = self.midToogleOne
+            self.state = self.midToggleOne
             self.emitBit(1)
         else:
             self.start()
