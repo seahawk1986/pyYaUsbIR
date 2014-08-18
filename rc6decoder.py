@@ -10,17 +10,17 @@ import bitarray
 
 class RC6Decoder():
     base = 444
-    s_min = base * 0.7
-    s_max = base * 1.3
+    s_min = int(base * 0.7)
+    s_max = int(base * 1.3)
+    l_min = int(base * 1.4)
+    l_max = int(base * 2.6)
+    t_min = int(base * 2.7)
+    t_max = int(base * 3.3)
+    u_min = int(base * 5)
+    u_max = int(base * 7)
     t1 = (s_min, s_max)
-    l_min = base * 1.4
-    l_max = base * 2.6
     t2 = (l_min, l_max)
-    t_min = base * 2.7
-    t_max = base * 3.3
     t3 = (t_min, t_max)
-    u_min = base * 5
-    u_max = base * 7
     t6 = (u_min, u_max)
 
     def __init__(self, output):
