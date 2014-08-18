@@ -46,7 +46,7 @@
 0x3b	KEY_PROG2
 0x3d	KEY_POWER2
 
-[RC-6-6A-32_15]
+[RC-6-6A-32_32783]
 # MCE Profile Harmony
 0x400	KEY_0
 0x401	KEY_1
