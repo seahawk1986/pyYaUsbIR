@@ -22,10 +22,13 @@ class RC6Decoder():
     t2 = (l_min, l_max)
     t3 = (t_min, t_max)
     t6 = (u_min, u_max)
+    gap = 1000
 
     def __init__(self, output):
         self.reset()
         self.output = output
+        self.last_addr = 0
+        self.last_cmd = 0
         self.repeat = 0
         self.toggleBit = None
         self.rc6_6A_32_header = bitarray.bitarray([1,1,1,0])
@@ -41,31 +44,28 @@ class RC6Decoder():
         #print(self.ircode[:3], self.rc6_philips_header)
         if len(self.ircode) == 21 and self.ircode[:3] == self.rc6_philips_header:
             toggleBit = self.ircode[4]
-            if toggleBit == self.toggleBit:
-                self.repeat += 1
-            else:
-                self.repeat = 0
-            mode = self.ircode[1:4].to01()
-            header = self.ircode[:4]
+            #header = self.ircode[1:4].to01()
             address = int(self.ircode[5:13].to01(), 2)
             cmd = int(self.ircode[13:].to01(), 2)
-            self.output.output(address, self.repeat, cmd, 'RC-6')
-            self.toggleBit = toggleBit
-            self.reset()
+            self.emit_keypress(toggleBit, address, cmd, 'RC-6')
 
         elif len(self.ircode) == 37 and self.ircode[:4] == self.rc6_6A_32_header:
             toggleBit = self.ircode[-16]
-            if toggleBit == self.toggleBit:
-                self.repeat += 1
-            else:
-                self.repeat = 0
-            
-            mode = self.ircode[1:4].to01()
+            #mode = self.ircode[1:4].to01()
             address = int(self.ircode[4:-16].to01(), 2)
             cmd = int(self.ircode[-15:].to01(), 2)
-            self.output.output(address, self.repeat, cmd, 'RC-6-6A-32')
-            self.toggleBit = toggleBit
-            self.reset()
+            self.emit_keypress(toggleBit, address, cmd, 'RC-6-6A-32')
+
+    def emit_keypress(self, toggleBit, address, cmd, protocol):
+        if (toggleBit, address, cmd) == (self.toggleBit, self.last_addr, self.last_cmd):
+            self.repeat += 1
+        else:
+            self.repeat = 0
+        self.toggleBit = toggleBit
+        self.last_addr = address
+        self.last_cmd = cmd
+        self.output.output(address, self.repeat, cmd, protocol)
+
 
     def check_duration(self, d, duration):
         if d[0] < duration < d[1]:
@@ -80,6 +80,10 @@ class RC6Decoder():
         if t and self.check_duration(self.t6, duration):
             self.state = self.end_start
             return
+        """elif not t:
+            #print(duration)
+            if duration > self.gap:
+                self.repeat = 0"""
         self.reset()
 
     def end_start(self, t, duration):
