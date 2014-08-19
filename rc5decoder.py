@@ -16,6 +16,8 @@ class RC5Decoder:
         self.start()
         self.toggleBit = None
         self.last_t = None
+        self.last_addr = None
+        self.last_cmd = None
         self.repeat = 0
         self.output = output
 
@@ -31,22 +33,23 @@ class RC5Decoder:
         self.last_t = t
 
     def emitBit(self, bit):
-        if bit in (0,1):
-            self.ircode.append(bit)
+        self.ircode.append(bit)
         if len(self.ircode) > 13:
             toggleBit = self.ircode[2]
-            if toggleBit == self.toggleBit:
-                self.repeat += 1
-            else:
-                self.repeat = 0
             address = int(self.ircode[3:8].to01(),2)
             cmdbitseven = self.ircode[1:2]
             cmdbitseven.invert()
             cmdbitseven.extend(self.ircode[8:])
             cmd = int(cmdbitseven.to01(), 2)
             #logging.debug("Address: ", hex(address), "\tCommand: ", hex(cmd), "\trepeat: ", self.repeat, "toggle Bit: ", toggleBit)
+            if (toggleBit, address, cmd) == (self.toggleBit, self.last_addr, self.last_cmd):
+                self.repeat += 1
+            else:
+                self.repeat = 0
             #print("0x%02x%02x" % (address, cmd))
             self.toggleBit = toggleBit
+            self.last_addr = address
+            self.last_cmd = cmd
             self.ircode = bitarray.bitarray()
             self.output.output(address, self.repeat, cmd, 'RC-5')
 
