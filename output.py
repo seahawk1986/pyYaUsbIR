@@ -14,7 +14,8 @@ class Output():
         self.OutputDevs = {}
         self.keymap = Keymap(keymap)
         #self.add_output_device()
-        self.add_output_device(devicename='lirc',devicetype='lirc',socket_path=socket_path, keymap=self.keymap)
+        self.add_output_device(devicename='lirc',devicetype='lirc',
+                               socket_path=socket_path, keymap=self.keymap)
         self.active_output = None
         self.set_active_output(activeout)
         syslog.syslog("Lircd Socket is set to %s" %(socket_path))
@@ -34,18 +35,24 @@ class Output():
                 self.active_output = self.OutputDevs[device]
                 #print(self.active_output)
             except:
-                syslog.syslog('No matching device for %s found, setting to None' %(device))
+                syslog.syslog(
+                    'No matching device for %s found, setting to None' %(device))
                 self.active_output = None
 
-    def add_output_device(self, devicename='lirc', devicetype='lirc', match=['KEY_'], socket_path='/var/run/lirc/lircd.ya', keymap=None):
-        self.OutputDevs[devicename] = OutputDev(devicename,devicetype,match,socket_path, keymap=self.keymap)
+    def add_output_device(self, devicename='lirc', devicetype='lirc',
+                          match=['KEY_'], socket_path='/var/run/lirc/lircd.ya',
+                                                                  keymap=None):
+        self.OutputDevs[devicename] = OutputDev(devicename,devicetype, match,
+                                                socket_path, keymap=self.keymap)
         #print('test2')
 
 class OutputDev():
-  
-    def __init__(self, devicename='lirc', devicetype='lirc', match=['KEY_','BTN_','REL_'],
-                                                       socket_path='/var/run/lirc/lircd.ya', keymap=None):    
-        self.devicetype = devicetype    
+
+    def __init__(self, devicename='lirc', devicetype='lirc',
+                 match=['KEY_','BTN_','REL_'],
+                 socket_path='/var/run/lirc/lircd.ya', keymap=None):
+
+        self.devicetype = devicetype
         self.keymap = keymap
         #if devicetype == 'uinput':
         #    self.events = self.select_capabilities(match)
@@ -118,7 +125,7 @@ class Keymap:
                 #key_dict[eval(code)] = keyname
                 key_dict[int(code, 16)] = keyname
             self.remotes[remote] = key_dict
-             
+
 
     def get_keyname(self, cmd, address, decoder):
         #logging.debug("{0}_{1}".format(decoder, address),"{0:#02x}".format(cmd))
@@ -127,5 +134,4 @@ class Keymap:
         except Exception as e:
             pass
             #print(e)
-            
-            
+
