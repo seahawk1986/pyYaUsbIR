@@ -23,3 +23,4 @@ TODO:
  * control daemon via dbus
  * Learning mode
  * additional decoders and encoders (?)
+ * yaUsbIR V1 support?
