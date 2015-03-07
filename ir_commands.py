@@ -35,12 +35,15 @@ class yaUsbIR_Control(dbus.service.Object):
     pause = [1, 78, 9, 80]
 
     def __init__(self, device):
-        self.endpoint_w = device[0][(0,0)][1]
+        self.device = device
+        self.set_endpoint_w()
         self.set_led_off()
         self.bus = dbus.SystemBus()
         bus_name = dbus.service.BusName('org.yausbir.control', bus=self.bus)
         dbus.service.Object.__init__(self, bus_name, '/cmd')
 
+    def set_endpoint_w(self):
+        self.endpoint_w = self.device[0][(0,0)][1]
 
     def send_cmd(self, commands):
         cmd = [self.ircmd[i] for i in commands]
